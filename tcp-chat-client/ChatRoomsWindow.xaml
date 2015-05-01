@@ -1,8 +1,8 @@
-﻿<Window x:Class="tcp_chat_client.ChatClientWindow"
-        Name="Chat"
+﻿<Window x:Class="tcp_chat_client.ChatRoomsWindow"
+        Name="ChatRooms"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="350" Width="525">
+        Title="Select Chat Room" Height="350" Width="525">
 
     <Grid>
         <Grid.RowDefinitions>

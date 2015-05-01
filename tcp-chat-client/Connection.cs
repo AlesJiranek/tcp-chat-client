@@ -4,16 +4,25 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace tcp_chat_client
 {
-    class Client
+    public class Connection
     {
         private TcpClient serverSocket;
         private bool isConnected = false;
+        private String username;
+
+
+        ~Connection()
+        {
+            this.Disconnect();
+        }
 
         public bool Connect()
         {
@@ -52,25 +61,56 @@ namespace tcp_chat_client
             this.isConnected = false;
         }
 
-        public void SendMessage(String message)
+
+        public void SetUsername(String username)
+        {
+            this.username = username;
+        }
+
+        public void SendMessage(String content)
+        {
+            Message message = new Message();
+            message.Type = Message.MessageType.normal;
+            message.Username = this.username;
+            message.Content = content;
+            message.Timestamp = DateTime.Now;
+
+            this.SendMessage(message);
+        }
+
+
+        public void SendSystemMessage(String content)
+        {
+            Message message = new Message();
+            message.Type = Message.MessageType.system;
+            message.Username = "System";
+            message.Content = content;
+
+            this.SendMessage(message);
+        }
+
+
+        private void SendMessage(Message message)
         {
             if (!this.isConnected)
             {
-                return;
+                this.Connect();
             }
 
-            NetworkStream stream = this.serverSocket.GetStream();
-            StreamWriter writer = new StreamWriter(stream);
-
-            writer.WriteLine(message);
-            writer.Flush();
+            BinaryFormatter formatter = new BinaryFormatter();
+            formatter.Binder = new DeserializationBinder();
+            formatter.Serialize(this.serverSocket.GetStream(), message);
         }
 
-        public String receiveMessage()
+
+        public Message receiveMessage()
         {
             NetworkStream stream = serverSocket.GetStream();
-            StreamReader reader = new StreamReader(stream);
-            String message = reader.ReadLine();
+
+            BinaryFormatter formatter = new BinaryFormatter();
+            formatter.Binder = new DeserializationBinder();
+
+            Message message = (Message)formatter.Deserialize(stream);
 
             return message;
         }

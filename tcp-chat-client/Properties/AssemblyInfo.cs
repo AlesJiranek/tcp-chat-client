@@ -12,7 +12,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("tcp-chat-client")]
-[assembly: AssemblyCopyright("Copyright ©  2015")]
+[assembly: AssemblyCopyright("Copyright ©2015 Aleš Jiránek")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

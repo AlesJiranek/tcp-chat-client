@@ -19,38 +19,33 @@ using System.Windows.Shapes;
 namespace tcp_chat_client
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for ChatRoomsWindow.xaml
     /// </summary>
-    public partial class ChatClientWindow : Window
+    public partial class ChatRoomsWindow : Window
     {
         private const String CREATE_NEW_TEXTROOM_TEXT = "Create a new chatroom...";
-        private Client client;
+        private Connection connection;
 
 
-        public ChatClientWindow()
+        public ChatRoomsWindow()
         {
-            this.client = new Client();
+            this.connection = new Connection();
 
-            if (!this.client.Connect())
+            if (!this.connection.Connect())
             {
                 MessageBox.Show("Unable to connect chat server! Server is not turned on probably.");
                 Environment.Exit(1);
             }
-
             InitializeComponent();
 
             this.showChatroomsList();
         }
 
-        ~ChatClientWindow()
-        {
-            this.client.Disconnect();
-        }
-
+ 
         private void showChatroomsList()
         {
-            String roomsString = this.client.receiveMessage();
-            List<String> chatRooms = roomsString.Split(';').ToList();
+            Message rooms = this.connection.receiveMessage();
+            List<String> chatRooms = (List<String>)rooms.Content;
             chatRooms.Add(CREATE_NEW_TEXTROOM_TEXT);
             this.ChatRoomsListBox.ItemsSource = chatRooms;
         }
@@ -69,6 +64,11 @@ namespace tcp_chat_client
                 if (chatroomNameDialog.ShowDialog() == true)
                 {
                     chatroomName = chatroomNameDialog.getAnswer();
+                    if(chatroomName == CREATE_NEW_TEXTROOM_TEXT)
+                    {
+                        MessageBox.Show("Haha, very funny...");
+                        return;
+                    }
                 }
                 else
                 {
@@ -84,7 +84,7 @@ namespace tcp_chat_client
                 }
 
                 // Check if entered name contains only valid characters
-                if (!this.client.ValidateName(chatroomName))
+                if (!this.connection.ValidateName(chatroomName))
                 {
                     MessageBox.Show("Invalid chatroom name!");
                     return;
@@ -100,14 +100,21 @@ namespace tcp_chat_client
                 String username = userNameDialog.getAnswer();
 
                 // Check if entered name contains only valid characters
-                if (!this.client.ValidateName(username))
+                if (!this.connection.ValidateName(username))
                 {
                     MessageBox.Show("Invalid name!");
                     return;
                 }
 
-                this.client.SendMessage(chatroomName);
-                this.client.SendMessage(username);
+                this.connection.SetUsername(username);
+
+                this.connection.SendMessage(chatroomName);
+                this.connection.SendMessage(username);
+
+                Window chatWindow = new ChatWindow(this.connection);
+                chatWindow.Activate();
+                chatWindow.Show();
+                this.Close();
             }
         }
     }

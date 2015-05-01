@@ -23,6 +23,7 @@ namespace tcp_chat_client
         {
             InitializeComponent();
             this.Question.Content = question;
+            this.Answer.Focus();
         }
 
         private void OkButton_Click(object sender, RoutedEventArgs e)
