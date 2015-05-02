@@ -4,7 +4,7 @@
         Title="ChatWindow" Height="300" Width="500">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*" MaxWidth="200"/>
+            <ColumnDefinition Width="1*" MaxWidth="200" />
             <ColumnDefinition Width="2*" />
             <ColumnDefinition Width="auto" />
         </Grid.ColumnDefinitions>
@@ -13,7 +13,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ListView Name="ConnectedUsersList" Grid.Column="0" Grid.RowSpan="2" Padding="5" />
+        <ListView Name="ConnectedUsersList" Grid.Column="0" Grid.RowSpan="2" Padding="5" BorderThickness="1" />
 
         <ScrollViewer Name="ReceievedMessagesScrollView" VerticalScrollBarVisibility="Auto" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" >
             <ItemsControl Name="ReceivedMessagesList" Padding="0 5 0 5" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
@@ -21,7 +21,7 @@
                     <DataTemplate>
                         <DockPanel>
                             <DockPanel DockPanel.Dock="Top">
-                                <TextBlock Text="{Binding Path=Timestamp, StringFormat={}{0:HH:mm:ss}}" Visibility="Visible" Margin="0 0 5 0" FontSize="10"  VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding Path=Timestamp, StringFormat={}{0:HH:mm:ss}}" Margin="0 0 5 0" FontSize="10"  VerticalAlignment="Center"  Style="{DynamicResource MessageTimeStyle}"/>
                                 <TextBlock Text="{Binding Path=Username}" FontWeight="Bold" VerticalAlignment="Center" />
                                 <TextBlock Text=":" FontWeight="Bold" VerticalAlignment="Center" />
                                 <TextBlock Text="{Binding Path=Content}" TextWrapping="Wrap" Padding="5 0 5 0" VerticalAlignment="Center"/>
@@ -30,6 +30,11 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+            <ScrollViewer.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Show times" Name="ShowTimesMenuItem" Click="ShowTimesMenuItem_Click"/>
+                </ContextMenu>
+            </ScrollViewer.ContextMenu>
         </ScrollViewer>
 
         <TextBox Name="MessageTextBox" Grid.Column="1" Grid.Row="1" Padding="5" KeyUp="MessageTextBox_KeyUp" />

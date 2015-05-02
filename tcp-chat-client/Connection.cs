@@ -19,11 +19,17 @@ namespace tcp_chat_client
         private String username;
 
 
+        /**
+         * Descructor
+         */
         ~Connection()
         {
             this.Disconnect();
         }
 
+        /**
+         * Connects to server
+         */ 
         public bool Connect()
         {
             String ip = "127.0.0.1";
@@ -50,6 +56,10 @@ namespace tcp_chat_client
             return this.isConnected;
         }
 
+
+        /**
+         * Disconnects from server
+         */ 
         public void Disconnect()
         {
             if (!this.isConnected)
@@ -62,11 +72,18 @@ namespace tcp_chat_client
         }
 
 
+        /**
+         * Sets username
+         */ 
         public void SetUsername(String username)
         {
             this.username = username;
         }
 
+
+        /**
+         * Wraps message text to message object and sends it to server
+         */ 
         public void SendMessage(String content)
         {
             Message message = new Message();
@@ -79,6 +96,9 @@ namespace tcp_chat_client
         }
 
 
+        /**
+         * Wraps content to system message object and sends it to server
+         */ 
         public void SendSystemMessage(String content)
         {
             Message message = new Message();
@@ -90,6 +110,9 @@ namespace tcp_chat_client
         }
 
 
+        /**
+         * Serializes and sends message to server
+         */ 
         private void SendMessage(Message message)
         {
             if (!this.isConnected)
@@ -103,6 +126,9 @@ namespace tcp_chat_client
         }
 
 
+        /**
+         * Receives and deserializes message from server
+         */ 
         public Message receiveMessage()
         {
             NetworkStream stream = serverSocket.GetStream();
@@ -113,13 +139,6 @@ namespace tcp_chat_client
             Message message = (Message)formatter.Deserialize(stream);
 
             return message;
-        }
-
-        public bool ValidateName(String name)
-        {
-            Regex reg = new Regex(@"^[a-zA-Zěščřžýáíéúů\s]+$");
-
-            return reg.IsMatch(name);
         }
     }
 }

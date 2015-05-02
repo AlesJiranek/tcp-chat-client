@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -27,10 +28,14 @@ namespace tcp_chat_client
         private Connection connection;
 
 
+        /**
+         * Initializes chat rooms window
+         */ 
         public ChatRoomsWindow()
         {
             this.connection = new Connection();
 
+            // Connect to server
             if (!this.connection.Connect())
             {
                 MessageBox.Show("Unable to connect chat server! Server is not turned on probably.");
@@ -38,10 +43,14 @@ namespace tcp_chat_client
             }
             InitializeComponent();
 
+            // Show list of available chat rooms
             this.showChatroomsList();
         }
 
- 
+
+        /**
+         * Shows list of available chat rooms
+         */
         private void showChatroomsList()
         {
             Message rooms = this.connection.receiveMessage();
@@ -51,11 +60,17 @@ namespace tcp_chat_client
         }
 
 
+        /**
+         * Handle click on chatroom
+         */ 
         private void ChatRoomsListBox_MouseDown(object sender, MouseButtonEventArgs e)
         {
             var tb = (TextBlock)e.OriginalSource;
             String chatroomName = tb.Text;
 
+            /**
+             * User wants to create new chatroom
+             */ 
             if (chatroomName.Equals(CREATE_NEW_TEXTROOM_TEXT))
             {
                 // Show dialog to enter new chatroom name
@@ -64,9 +79,11 @@ namespace tcp_chat_client
                 if (chatroomNameDialog.ShowDialog() == true)
                 {
                     chatroomName = chatroomNameDialog.getAnswer();
+
+                    // User is joker and tries to break this client
                     if(chatroomName == CREATE_NEW_TEXTROOM_TEXT)
                     {
-                        MessageBox.Show("Haha, very funny...");
+                        MessageBox.Show("Haha, very funny... Try it again");
                         return;
                     }
                 }
@@ -84,7 +101,7 @@ namespace tcp_chat_client
                 }
 
                 // Check if entered name contains only valid characters
-                if (!this.connection.ValidateName(chatroomName))
+                if (!this.ValidateName(chatroomName))
                 {
                     MessageBox.Show("Invalid chatroom name!");
                     return;
@@ -100,7 +117,7 @@ namespace tcp_chat_client
                 String username = userNameDialog.getAnswer();
 
                 // Check if entered name contains only valid characters
-                if (!this.connection.ValidateName(username))
+                if (!this.ValidateName(username))
                 {
                     MessageBox.Show("Invalid name!");
                     return;
@@ -112,10 +129,22 @@ namespace tcp_chat_client
                 this.connection.SendMessage(username);
 
                 Window chatWindow = new ChatWindow(this.connection);
+                chatWindow.Title = chatroomName;
                 chatWindow.Activate();
                 chatWindow.Show();
                 this.Close();
             }
+        }
+
+
+        /**
+         * Validates given name
+         */ 
+        public bool ValidateName(String name)
+        {
+            Regex reg = new Regex(@"^[a-zA-Zěščřžýáíéúů\s]+$");
+
+            return reg.IsMatch(name);
         }
     }
 }

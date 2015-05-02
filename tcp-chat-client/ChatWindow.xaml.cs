@@ -24,6 +24,10 @@ namespace tcp_chat_client
         private Connection connection;
         private List<Message> messages;
 
+
+        /**
+         * Init main chat window
+         */
         public ChatWindow(Connection client)
         {
             this.connection = client;
@@ -38,9 +42,15 @@ namespace tcp_chat_client
 
         }
 
+
+        /**
+         * Receives and displays list of users connected to chatroom
+         */
         private void showConnectedUsersList()
         {
-            this.Dispatcher.Invoke((Action)(() => { 
+            // We need to invoke action when updating clients list from receive thread
+            this.Dispatcher.Invoke((Action)(() =>
+            {
                 Message users = this.connection.receiveMessage();
                 List<String> usersList = (List<String>)users.Content;
                 this.ConnectedUsersList.ItemsSource = usersList;
@@ -48,36 +58,54 @@ namespace tcp_chat_client
             }));
         }
 
+
+        /**
+         * Handles send button click
+         */
         private void SendMessageButton_Click(object sender, RoutedEventArgs e)
         {
             this.sendMessage();
         }
 
+
+        /**
+         * Gets text from text box and sends it to server
+         */
         private void sendMessage()
         {
             if (this.MessageTextBox.Text.Length <= 0)
                 return;
 
-            this.connection.SendMessage(MessageTextBox.Text);
+            this.connection.SendMessage(MessageTextBox.Text.Trim());
             this.MessageTextBox.Text = "";
         }
 
+
+        /**
+         * Handles user input to message text box
+         */
         private void MessageTextBox_KeyUp(object sender, KeyEventArgs e)
         {
             if (MessageTextBox.Text.Length > 0)
             {
+                // Enable send button if message text is not empty
                 SendMessageButton.IsEnabled = true;
 
+                // If pressed key is enter, send message
                 if (e.Key == Key.Enter)
                     this.sendMessage();
             }
             else
             {
+                // Disable send button if message text is empty
                 SendMessageButton.IsEnabled = false;
             }
         }
 
 
+        /**
+         * Method for receiving messages from server
+         */
         private void receiveMessages()
         {
             Message message;
@@ -88,38 +116,78 @@ namespace tcp_chat_client
                 {
                     message = this.connection.receiveMessage();
 
+                    // Received message is system message
                     if (message.Type == Message.MessageType.system)
                     {
                         this.handleSystemMessage(message);
                     }
+
+                    // Received message is normal message
                     else
                     {
+                        // Need to invoke action because we are updating messages list, which parent is in different thread
                         this.Dispatcher.Invoke((Action)(() =>
                         {
+                            // Add message to messages list items control
                             this.messages.Add(message);
-                            this.ReceivedMessagesList.Items.MoveCurrentToLast();
+                            // Refresh messages list
                             this.ReceivedMessagesList.Items.Refresh();
+                            // Scroll messages to bottom
                             this.ReceievedMessagesScrollView.ScrollToBottom();
                         }));
                     }
                 }
             }
-            catch (IOException)
+            catch (Exception)
             {
                 MessageBox.Show("Server was shut down");
+                this.Dispatcher.Invoke((Action)(() =>
+                {
+                    this.Close();
+                }));
+
                 return;
             }
         }
 
 
+        /**
+         * Handles system message
+         */
         private void handleSystemMessage(Message message)
         {
             switch (message.Content.ToString())
             {
                 case "Connected Users":
-                    this.showConnectedUsersList(); 
+                    this.showConnectedUsersList();
                     break;
                 default: return;
+            }
+        }
+
+
+        /**
+         * Handles context menu on messages list
+         */
+        private void ShowTimesMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            // Show messages times
+            if (ShowTimesMenuItem.IsChecked)
+            {
+                Style style = new Style(typeof(TextBlock));
+                style.Setters.Add(new Setter(TextBlock.VisibilityProperty, Visibility.Hidden));
+                style.Setters.Add(new Setter(TextBlock.WidthProperty, 0.0));
+                Application.Current.Resources["MessageTimeStyle"] = style;
+                ShowTimesMenuItem.IsChecked = false;
+            }
+
+            // Hide messages style
+            else
+            {
+                Style style = new Style(typeof(TextBlock));
+                style.Setters.Add(new Setter(TextBlock.VisibilityProperty, Visibility.Visible));
+                Application.Current.Resources["MessageTimeStyle"] = style;
+                ShowTimesMenuItem.IsChecked = true;
             }
         }
 
