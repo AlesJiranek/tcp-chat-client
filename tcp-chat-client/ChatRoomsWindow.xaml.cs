@@ -142,7 +142,7 @@ namespace tcp_chat_client
          */ 
         public bool ValidateName(String name)
         {
-            Regex reg = new Regex(@"^[a-zA-Zěščřžýáíéúů\s]+$");
+            Regex reg = new Regex(@"^[a-zA-ZěščřžýáíéúůĚŠČŘŽÝÁÍÉÚŮ\s]+$");
 
             return reg.IsMatch(name);
         }
