@@ -31,7 +31,7 @@ namespace tcp_chat_client
             this.DialogResult = true;
         }
 
-        public String getAnswer()
+        public String GetAnswer()
         {
             return Answer.Text;
         }

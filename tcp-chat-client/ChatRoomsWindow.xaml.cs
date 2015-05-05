@@ -44,16 +44,16 @@ namespace tcp_chat_client
             InitializeComponent();
 
             // Show list of available chat rooms
-            this.showChatroomsList();
+            this.ShowChatroomsList();
         }
 
 
         /**
          * Shows list of available chat rooms
          */
-        private void showChatroomsList()
+        private void ShowChatroomsList()
         {
-            Message rooms = this.connection.receiveMessage();
+            Message rooms = this.connection.ReceiveMessage();
             List<String> chatRooms = (List<String>)rooms.Content;
             chatRooms.Add(CREATE_NEW_TEXTROOM_TEXT);
             this.ChatRoomsListBox.ItemsSource = chatRooms;
@@ -78,7 +78,7 @@ namespace tcp_chat_client
                 chatroomNameDialog.Title = "Enter Chatroom Name";
                 if (chatroomNameDialog.ShowDialog() == true)
                 {
-                    chatroomName = chatroomNameDialog.getAnswer();
+                    chatroomName = chatroomNameDialog.GetAnswer();
 
                     // User is joker and tries to break this client
                     if(chatroomName == CREATE_NEW_TEXTROOM_TEXT)
@@ -114,7 +114,7 @@ namespace tcp_chat_client
             userNameDialog.Title = "Enter Name";
             if (userNameDialog.ShowDialog() == true)
             {
-                String username = userNameDialog.getAnswer();
+                String username = userNameDialog.GetAnswer();
 
                 // Check if entered name contains only valid characters
                 if (!this.ValidateName(username))

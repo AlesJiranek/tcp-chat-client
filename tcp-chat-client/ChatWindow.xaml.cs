@@ -37,7 +37,7 @@ namespace tcp_chat_client
             this.MessageTextBox.Focus();
             this.ReceivedMessagesList.ItemsSource = this.messages = new List<Message>();
 
-            Task receiveTask = new Task(this.receiveMessages);
+            Task receiveTask = new Task(this.ReceiveMessages);
             receiveTask.Start();
 
         }
@@ -46,12 +46,12 @@ namespace tcp_chat_client
         /**
          * Receives and displays list of users connected to chatroom
          */
-        private void showConnectedUsersList()
+        private void ShowConnectedUsersList()
         {
             // We need to invoke action when updating clients list from receive thread
             this.Dispatcher.Invoke((Action)(() =>
             {
-                Message users = this.connection.receiveMessage();
+                Message users = this.connection.ReceiveMessage();
                 List<String> usersList = (List<String>)users.Content;
                 this.ConnectedUsersList.ItemsSource = usersList;
                 this.ConnectedUsersList.Items.Refresh();
@@ -64,14 +64,14 @@ namespace tcp_chat_client
          */
         private void SendMessageButton_Click(object sender, RoutedEventArgs e)
         {
-            this.sendMessage();
+            this.SendMessage();
         }
 
 
         /**
          * Gets text from text box and sends it to server
          */
-        private void sendMessage()
+        private void SendMessage()
         {
             if (this.MessageTextBox.Text.Length <= 0)
                 return;
@@ -93,7 +93,7 @@ namespace tcp_chat_client
 
                 // If pressed key is enter, send message
                 if (e.Key == Key.Enter)
-                    this.sendMessage();
+                    this.SendMessage();
             }
             else
             {
@@ -106,7 +106,7 @@ namespace tcp_chat_client
         /**
          * Method for receiving messages from server
          */
-        private void receiveMessages()
+        private void ReceiveMessages()
         {
             Message message;
 
@@ -114,12 +114,12 @@ namespace tcp_chat_client
             {
                 while (true)
                 {
-                    message = this.connection.receiveMessage();
+                    message = this.connection.ReceiveMessage();
 
                     // Received message is system message
                     if (message.Type == Message.MessageType.system)
                     {
-                        this.handleSystemMessage(message);
+                        this.HandleSystemMessage(message);
                     }
 
                     // Received message is normal message
@@ -154,12 +154,12 @@ namespace tcp_chat_client
         /**
          * Handles system message
          */
-        private void handleSystemMessage(Message message)
+        private void HandleSystemMessage(Message message)
         {
             switch (message.Content.ToString())
             {
                 case "Connected Users":
-                    this.showConnectedUsersList();
+                    this.ShowConnectedUsersList();
                     break;
                 default: return;
             }

@@ -142,7 +142,7 @@ namespace tcp_chat_client
         /**
          * Receives and deserializes message from server
          */ 
-        public Message receiveMessage()
+        public Message ReceiveMessage()
         {
             NetworkStream stream = serverSocket.GetStream();
 
