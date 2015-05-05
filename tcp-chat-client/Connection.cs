@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -8,6 +9,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Xml.Serialization;
 
 namespace tcp_chat_client
@@ -32,19 +34,30 @@ namespace tcp_chat_client
          */ 
         public bool Connect()
         {
-            String ip = "127.0.0.1";
-            int port = 7777;
+            IPAddress ipAddress;
+            int port;
 
             if (this.isConnected)
             {
                 return true;
             }
 
-            IPAddress ipAddress = IPAddress.Parse(ip);
+            if (!IPAddress.TryParse(ConfigurationManager.AppSettings["ip"], out ipAddress))
+            {
+                MessageBox.Show("Invalid ip address in config file.");
+                return false;
+            }
+
+            if (!int.TryParse(ConfigurationManager.AppSettings["port"], out port))
+            {
+                MessageBox.Show("Invalid port in config file.");
+                return false;
+            }
+
             try
             {
                 this.serverSocket = new TcpClient();
-                this.serverSocket.Connect(ip, port);
+                this.serverSocket.Connect(ipAddress, port);
                 this.isConnected = true;
             }
             catch (Exception e)
